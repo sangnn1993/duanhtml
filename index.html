@@ -1,15 +1,425 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bài 16</title>
+    <title>Gantt Chart: Application Development Timeline</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      #gantt-chart-container {
+        width: 100%;
+        overflow-x: auto; /* Thanh cuộn ngang */
+      }
+      #gantt-chart {
+        width: 3000px; /* Chiều rộng lớn để kích hoạt thanh cuộn */
+        height: 1000px;
+      }
+      /* Đảm bảo nhãn trục Y hiển thị đầy đủ */
+      .yaxislayer-above text {
+        font-size: 12px;
+        white-space: nowrap;
+      }
+    </style>
   </head>
   <body>
-    <h1>Bài 16: Git</h1>
-    <h2>sửa đổi lần 1</h2>
-    <h2>sửa đổi lần 2</h2>
-    <h2>sửa đổi lần 3</h2>
-    <h2>sửa đổi lần 4</h2>
+    <div id="gantt-chart-container">
+      <div id="gantt-chart"></div>
+    </div>
+    <script>
+      // Dữ liệu Gantt Chart
+      const data = [
+        // Appsheet: Quản Lý Dầu (12)
+        {
+          Task: "Quản Lý Dầu (Appsheet) - Phân tích + Thiết kế",
+          Start: "2025-06-01",
+          Finish: "2025-06-14",
+          Technology: "Appsheet",
+        },
+        {
+          Task: "Quản Lý Dầu (Appsheet) - Phát triển + Kiểm thử + Triển khai",
+          Start: "2025-06-15",
+          Finish: "2025-06-30",
+          Technology: "Appsheet",
+        },
+        // Appsheet: Trung Tâm Điều Hành (13)
+        {
+          Task: "Trung Tâm Điều Hành (Appsheet) - Phân tích + Thiết kế",
+          Start: "2025-07-01",
+          Finish: "2025-07-14",
+          Technology: "Appsheet",
+        },
+        {
+          Task: "Trung Tâm Điều Hành (Appsheet) - Phát triển + Kiểm thử + Triển khai",
+          Start: "2025-07-15",
+          Finish: "2025-07-31",
+          Technology: "Appsheet",
+        },
+        // React: CRM - Pricing (5)
+        {
+          Task: "CRM - Pricing (React) - Phân tích + Thiết kế",
+          Start: "2025-06-01",
+          Finish: "2025-06-30",
+          Technology: "React",
+        },
+        {
+          Task: "CRM - Pricing (React) - Phát triển Frontend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "React",
+        },
+        {
+          Task: "CRM - Pricing (React) - Phát triển Backend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "React",
+        },
+        {
+          Task: "CRM - Pricing (React) - Kiểm thử + Triển khai",
+          Start: "2025-09-15",
+          Finish: "2025-09-30",
+          Technology: "React",
+        },
+        // React: FWD - Nội địa (6)
+        {
+          Task: "FWD - Nội địa (React) - Phân tích + Thiết kế",
+          Start: "2025-06-01",
+          Finish: "2025-06-30",
+          Technology: "React",
+        },
+        {
+          Task: "FWD - Nội địa (React) - Phát triển Frontend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "React",
+        },
+        {
+          Task: "FWD - Nội địa (React) - Phát triển Backend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "React",
+        },
+        {
+          Task: "FWD - Nội địa (React) - Kiểm thử + Triển khai",
+          Start: "2025-09-15",
+          Finish: "2025-09-30",
+          Technology: "React",
+        },
+        // React: Trucking (7)
+        {
+          Task: "Trucking (React) - Phân tích + Thiết kế",
+          Start: "2025-10-15",
+          Finish: "2025-11-14",
+          Technology: "React",
+        },
+        {
+          Task: "Trucking (React) - Phát triển Frontend",
+          Start: "2025-11-15",
+          Finish: "2026-02-14",
+          Technology: "React",
+        },
+        {
+          Task: "Trucking (React) - Phát triển Backend",
+          Start: "2025-11-15",
+          Finish: "2026-02-14",
+          Technology: "React",
+        },
+        {
+          Task: "Trucking (React) - Kiểm thử + Triển khai",
+          Start: "2026-02-15",
+          Finish: "2026-02-28",
+          Technology: "React",
+        },
+        // Flutter: Mobile: Tài Xế (8)
+        {
+          Task: "Mobile: Tài Xế (Flutter) - Phân tích + Thiết kế",
+          Start: "2025-06-01",
+          Finish: "2025-06-30",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: Tài Xế (Flutter) - Phát triển Frontend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: Tài Xế (Flutter) - Phát triển Backend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: Tài Xế (Flutter) - Kiểm thử + Triển khai",
+          Start: "2025-09-15",
+          Finish: "2025-09-30",
+          Technology: "Flutter",
+        },
+        // Flutter: Mobile: Kiểm Đếm (9)
+        {
+          Task: "Mobile: Kiểm Đếm (Flutter) - Phân tích + Thiết kế",
+          Start: "2025-06-01",
+          Finish: "2025-06-30",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: Kiểm Đếm (Flutter) - Phát triển Frontend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: Kiểm Đếm (Flutter) - Phát triển Backend",
+          Start: "2025-07-01",
+          Finish: "2025-09-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: Kiểm Đếm (Flutter) - Kiểm thử + Triển khai",
+          Start: "2025-09-15",
+          Finish: "2025-09-30",
+          Technology: "Flutter",
+        },
+        // Flutter: Mobile: CRM (10)
+        {
+          Task: "Mobile: CRM (Flutter) - Phân tích + Thiết kế",
+          Start: "2025-10-15",
+          Finish: "2025-11-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: CRM (Flutter) - Phát triển Frontend",
+          Start: "2025-11-15",
+          Finish: "2026-02-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: CRM (Flutter) - Phát triển Backend",
+          Start: "2025-11-15",
+          Finish: "2026-02-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "Mobile: CRM (Flutter) - Kiểm thử + Triển khai",
+          Start: "2026-02-15",
+          Finish: "2026-02-28",
+          Technology: "Flutter",
+        },
+        // React: Depot & Log (14)
+        {
+          Task: "Depot & Log (React) - Phân tích + Thiết kế",
+          Start: "2026-04-01",
+          Finish: "2026-04-30",
+          Technology: "React",
+        },
+        {
+          Task: "Depot & Log (React) - Phát triển Frontend",
+          Start: "2026-05-01",
+          Finish: "2026-07-14",
+          Technology: "React",
+        },
+        {
+          Task: "Depot & Log (React) - Phát triển Backend",
+          Start: "2026-05-01",
+          Finish: "2026-07-14",
+          Technology: "React",
+        },
+        {
+          Task: "Depot & Log (React) - Kiểm thử + Triển khai",
+          Start: "2026-07-15",
+          Finish: "2026-07-31",
+          Technology: "React",
+        },
+        // React: Kinh Doanh Sà lan (15)
+        {
+          Task: "Kinh Doanh Sà lan (React) - Phân tích + Thiết kế",
+          Start: "2026-08-01",
+          Finish: "2026-08-31",
+          Technology: "React",
+        },
+        {
+          Task: "Kinh Doanh Sà lan (React) - Phát triển Frontend",
+          Start: "2026-09-01",
+          Finish: "2026-09-30",
+          Technology: "React",
+        },
+        {
+          Task: "Kinh Doanh Sà lan (React) - Phát triển Backend",
+          Start: "2026-09-01",
+          Finish: "2026-09-30",
+          Technology: "React",
+        },
+        // Flutter: FWD - Quốc tế (17)
+        {
+          Task: "FWD - Quốc tế (Flutter) - Phân tích + Thiết kế",
+          Start: "2026-04-01",
+          Finish: "2026-04-30",
+          Technology: "Flutter",
+        },
+        {
+          Task: "FWD - Quốc tế (Flutter) - Phát triển Frontend",
+          Start: "2026-05-01",
+          Finish: "2026-07-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "FWD - Quốc tế (Flutter) - Phát triển Backend",
+          Start: "2026-05-01",
+          Finish: "2026-07-14",
+          Technology: "Flutter",
+        },
+        {
+          Task: "FWD - Quốc tế (Flutter) - Kiểm thử + Triển khai",
+          Start: "2026-07-15",
+          Finish: "2026-07-31",
+          Technology: "Flutter",
+        },
+      ];
+
+      // Tạo danh sách các tuần cho trục X
+      const startDate = new Date("2025-06-01");
+      const endDate = new Date("2026-09-30");
+      const weeks = [];
+      let currentDate = startDate;
+      while (currentDate <= endDate) {
+        weeks.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 7);
+      }
+
+      // Chuẩn bị dữ liệu cho Plotly
+      const traces = data.map((d) => ({
+        x: [d.Start, d.Finish],
+        y: [d.Task, d.Task],
+        mode: "lines",
+        line: { width: 20 },
+        name: d.Technology,
+        marker: {
+          color:
+            d.Technology === "Appsheet"
+              ? "#ff7f0e"
+              : d.Technology === "React"
+              ? "#1f77b4"
+              : "#2ca02c",
+        },
+        showlegend:
+          data.indexOf(d) ===
+          data.findIndex((item) => item.Technology === d.Technology),
+      }));
+
+      // Thứ tự trục Y đảo ngược
+      const tasksOrder = [
+        "FWD - Quốc tế (Flutter) - Kiểm thử + Triển khai",
+        "FWD - Quốc tế (Flutter) - Phát triển Backend",
+        "FWD - Quốc tế (Flutter) - Phát triển Frontend",
+        "FWD - Quốc tế (Flutter) - Phân tích + Thiết kế",
+        "Kinh Doanh Sà lan (React) - Phát triển Backend",
+        "Kinh Doanh Sà lan (React) - Phát triển Frontend",
+        "Kinh Doanh Sà lan (React) - Phân tích + Thiết kế",
+        "Depot & Log (React) - Kiểm thử + Triển khai",
+        "Depot & Log (React) - Phát triển Backend",
+        "Depot & Log (React) - Phát triển Frontend",
+        "Depot & Log (React) - Phân tích + Thiết kế",
+        "Mobile: CRM (Flutter) - Kiểm thử + Triển khai",
+        "Mobile: CRM (Flutter) - Phát triển Backend",
+        "Mobile: CRM (Flutter) - Phát triển Frontend",
+        "Mobile: CRM (Flutter) - Phân tích + Thiết kế",
+        "Mobile: Kiểm Đếm (Flutter) - Kiểm thử + Triển khai",
+        "Mobile: Kiểm Đếm (Flutter) - Phát triển Backend",
+        "Mobile: Kiểm Đếm (Flutter) - Phát triển Frontend",
+        "Mobile: Kiểm Đếm (Flutter) - Phân tích + Thiết kế",
+        "Mobile: Tài Xế (Flutter) - Kiểm thử + Triển khai",
+        "Mobile: Tài Xế (Flutter) - Phát triển Backend",
+        "Mobile: Tài Xế (Flutter) - Phát triển Frontend",
+        "Mobile: Tài Xế (Flutter) - Phân tích + Thiết kế",
+        "Trucking (React) - Kiểm thử + Triển khai",
+        "Trucking (React) - Phát triển Backend",
+        "Trucking (React) - Phát triển Frontend",
+        "Trucking (React) - Phân tích + Thiết kế",
+        "FWD - Nội địa (React) - Kiểm thử + Triển khai",
+        "FWD - Nội địa (React) - Phát triển Backend",
+        "FWD - Nội địa (React) - Phát triển Frontend",
+        "FWD - Nội địa (React) - Phân tích + Thiết kế",
+        "CRM - Pricing (React) - Kiểm thử + Triển khai",
+        "CRM - Pricing (React) - Phát triển Backend",
+        "CRM - Pricing (React) - Phát triển Frontend",
+        "CRM - Pricing (React) - Phân tích + Thiết kế",
+        "Trung Tâm Điều Hành (Appsheet) - Phát triển + Kiểm thử + Triển khai",
+        "Trung Tâm Điều Hành (Appsheet) - Phân tích + Thiết kế",
+        "Quản Lý Dầu (Appsheet) - Phát triển + Kiểm thử + Triển khai",
+        "Quản Lý Dầu (Appsheet) - Phân tích + Thiết kế",
+      ];
+
+      // Vị trí đường phân chia ngang
+      const hlinePositions = [];
+      const appGroups = [
+        { app: "FWD - Quốc tế (Flutter)", numTasks: 4 },
+        { app: "Kinh Doanh Sà lan (React)", numTasks: 3 },
+        { app: "Depot & Log (React)", numTasks: 4 },
+        { app: "Mobile: CRM (Flutter)", numTasks: 4 },
+        { app: "Mobile: Kiểm Đếm (Flutter)", numTasks: 4 },
+        { app: "Mobile: Tài Xế (Flutter)", numTasks: 4 },
+        { app: "Trucking (React)", numTasks: 4 },
+        { app: "FWD - Nội địa (React)", numTasks: 4 },
+        { app: "CRM - Pricing (React)", numTasks: 4 },
+        { app: "Trung Tâm Điều Hành (Appsheet)", numTasks: 2 },
+        { app: "Quản Lý Dầu (Appsheet)", numTasks: 2 },
+      ];
+      let cumulativeTasks = 0;
+      for (const group of appGroups) {
+        cumulativeTasks += group.numTasks;
+        hlinePositions.push(cumulativeTasks - 0.5);
+      }
+
+      // Tùy chỉnh layout
+      const layout = {
+        title:
+          "Gantt Chart: Timeline Phát Triển Ứng Dụng (01/06/2025 - 30/09/2026)",
+        xaxis: {
+          title: "Tuần",
+          tickformat: "%d/%m/%Y",
+          tickangle: 45,
+          tickvals: weeks,
+          ticktext: weeks.map((d) =>
+            d.toLocaleDateString("vi-VN", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          ),
+          rangeslider: { visible: true },
+        },
+        yaxis: {
+          title: "Ứng dụng và Quy trình",
+          categoryorder: "array",
+          categoryarray: tasksOrder,
+          automargin: true, // Tự động điều chỉnh chiều rộng cột Y
+          tickfont: { size: 12 },
+        },
+        showlegend: true,
+        height: 1400,
+        width: 3000, // Chiều rộng lớn để hỗ trợ thanh cuộn
+        margin: {
+          l: 400, // Tăng lề trái để chứa nhãn dài
+          r: 50,
+          t: 100,
+          b: 200,
+        },
+        shapes: hlinePositions.map((pos) => ({
+          type: "line",
+          x0: startDate,
+          x1: endDate,
+          y0: pos,
+          y1: pos,
+          line: { color: "black", width: 1, dash: "dash" },
+        })),
+      };
+
+      // Vẽ biểu đồ
+      Plotly.newPlot("gantt-chart", traces, layout);
+    </script>
   </body>
 </html>
